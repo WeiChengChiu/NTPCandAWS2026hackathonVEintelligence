@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets / credentials -- never commit these
+.env
+.env.*
+!.env.example
+*.pem
+aws_credentials*
+credentials
+**/.aws/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.idea/
+*.swp
+
+# Local artifacts
+outputs/
+*.log

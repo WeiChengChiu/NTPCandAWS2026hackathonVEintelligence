@@ -1,0 +1,3 @@
+# agentic_retrieve_stream requires a recent botocore; 1.43.93 is the version verified to expose it.
+boto3>=1.43.93
+botocore>=1.43.93

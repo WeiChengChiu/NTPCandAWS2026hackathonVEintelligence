@@ -1,0 +1,33 @@
+# Normalise line endings so macOS and Windows collaborators don't fight over
+# whole-file diffs. Text files are stored as LF in the repo and checked out
+# with the platform's native ending.
+* text=auto
+
+# Explicit rules for the file types in this project.
+*.py     text diff=python
+*.md     text
+*.txt    text
+*.json   text
+*.yml    text
+*.yaml   text
+*.toml   text
+*.cfg    text
+*.ini    text
+
+# Shell scripts must stay LF even on Windows or they break in bash/WSL.
+*.sh     text eol=lf
+
+# Windows batch files must stay CRLF.
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+
+# Binary assets: never touch, never diff.
+*.pdf    binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.ico    binary
+*.zip    binary
+*.parquet binary
