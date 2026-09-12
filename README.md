@@ -1,0 +1,1 @@
+# NTPCandAWS2026hackathonVEintelligence
