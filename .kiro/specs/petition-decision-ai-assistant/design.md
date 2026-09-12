@@ -1574,93 +1574,139 @@ def test_bedrock_stays_under_1_rps():
 
 對所有 `SourceDocument d`，若 `redact_document(d)` 成功返回 `(r, m)`，則 `scan_residual("\n".join(r.paragraphs)) == []`。
 
+**Validates: Requirements 2.5, 2.6**
+
 ### Property 2: 去識別化可逆性
 
 對所有 `SourceDocument d`，若 `redact_document(d)` 成功返回 `(r, m)`，則 `restore(r, m) == d`。
+
+**Validates: Requirements 2.9, 2.12**
 
 ### Property 3: 代號單射性
 
 對所有 `RedactionMap m`，`len(set(m.mapping.values())) == len(m.mapping)`。
 
+**Validates: Requirements 2.3, 2.4**
+
 ### Property 4: 段落結構保持
 
 對所有 `SourceDocument d`，`len(redact(d).paragraphs) == len(d.paragraphs)` 且 `redact(d).page_of_paragraph == d.page_of_paragraph`。
+
+**Validates: Requirements 1.5, 2.8**
 
 ### Property 5: 速率上界
 
 對所有並發呼叫序列，`RateLimiter` 授權之時間戳集合中，任意 1 秒滑動窗內元素數 ≤ 1。
 
+**Validates: Requirements 12.1**
+
 ### Property 6: 無旁路
 
 對所有 Bedrock API 呼叫，皆源自 `BedrockGateway`；靜態檢查下 `boto3.client("bedrock-runtime")` 與 `boto3.client("bedrock-agent-runtime")` 僅出現於 `BedrockGateway.__init__`。
+
+**Validates: Requirements 12.2**
 
 ### Property 7: 融合分數有界
 
 對所有 `LawCitation c` 與合法 `FusionWeights w`，`fuse_scores(c, w) ∈ [0.0, 1.0]`。
 
+**Validates: Requirements 5.5**
+
 ### Property 8: 回饋單調性
 
 對所有 `(case_type, issue_tag, item_id)`，若對其連續套用 n 筆 `ACCEPT` 事件，則權重序列單調不減；連續套用 n 筆 `REJECT` 事件，則權重序列單調不增。
+
+**Validates: Requirements 9.10, 9.11**
 
 ### Property 9: 權重有界
 
 對所有 `FeedbackEvent` 序列，套用後所有 `PreferenceWeight.weight ∈ [0.0, 1.0]`。
 
+**Validates: Requirements 9.8, 9.9**
+
 ### Property 10: 回饋冪等
 
 對所有 `FeedbackEvent e`，`update(e); update(e)` 之結果等同於 `update(e)`。
+
+**Validates: Requirements 9.13**
 
 ### Property 11: 冷啟動中性
 
 對所有 `LawCitation` 清單，若全部項目之 `feedback_weight == 0.5`，則融合排序與純 `kb_score` 排序一致。
 
+**Validates: Requirements 5.6, 9.14**
+
 ### Property 12: 相似案例數量與唯一性
 
 對所有查詢，`len(match(...)) <= limit` 且結果中 `document_id` 互不重複。
+
+**Validates: Requirements 6.1, 6.2**
 
 ### Property 13: 相似案例類型一致
 
 對所有 `case_type != OTHER` 之查詢，回傳之每個 `PrecedentMatch.case_type == case_type`。
 
+**Validates: Requirements 6.3**
+
 ### Property 14: 相似度分項有界
 
 對所有 `PrecedentMatch m`，`m.breakdown` 之每個分項 `∈ [0.0, 1.0]`。
+
+**Validates: Requirements 6.4**
 
 ### Property 15: 引用不幻覺
 
 對所有 `DecisionDraft d` 與許可清單 `A`，若 `verify(d, A).passed` 為真，則 `d` 中每個法規引用皆可正規化後對應至 `A` 中某個 `law_id`。
 
+**Validates: Requirements 8.3, 8.5, 8.10**
+
 ### Property 16: 引用驗證覆蓋
 
 對所有 `DecisionDraft d`，`d` 中被擷取之每個引用字串在 `verify(d, A).issues` 中恰出現一次。
+
+**Validates: Requirements 8.1, 8.2**
 
 ### Property 17: 模板段落不變
 
 對所有 `DecisionTemplate t` 與案件，生成之草稿中 `generated == False` 之段落內容，與 `t` 對應欄位逐字相同。
 
+**Validates: Requirements 7.2, 7.3, 7.4**
+
 ### Property 18: 教示規定必存在
 
 對所有生成之 `DecisionDraft`，存在 `section_id == "instruction"` 之段落且其內容非空。
+
+**Validates: Requirements 7.5**
 
 ### Property 19: AWS 側無個資
 
 對所有寫入 S3 或 KB 之 payload，`scan_residual(payload) == []`。
 
+**Validates: Requirements 2.1, 2.11**
+
 ### Property 20: 對照表不外送
 
 對所有序列化路徑，`RedactionMap` 不出現於任何 AWS SDK 呼叫參數中（以測試替身斷言）。
+
+**Validates: Requirements 2.10, 2.13**
 
 ### Property 21: 回饋事件無個資
 
 對所有 `FeedbackEvent e`，`scan_residual(serialize(e)) == []`。
 
+**Validates: Requirements 9.16**
+
 ### Property 22: 檢索空結果安全
 
 對所有查詢，若 KB 回傳空結果，則 `recommend` 與 `match` 回傳空清單而不拋出例外。
 
+**Validates: Requirements 5.9, 6.7**
+
 ### Property 23: 優化有效性，統計性質
 
 對於同一 `case_type`，隨著回饋事件累積，`OptimizationMetrics.mean_edit_distance_ratio` 之移動平均應呈非上升趨勢。此為統計性質，以離線回放（replay）評估而非單元測試。
+
+**Validates: Requirements 10.3, 10.4**
 
 ---
 
